@@ -6,8 +6,8 @@ Particle::Particle(float maxLife,float radius){
     force = glm::vec3(0.0f);
     mass = 1.0f;
     life = maxLife;
-    maxLife = maxLife;
-    radius = radius;
+    this->maxLife = maxLife;
+    this->radius = radius;
 
 }
 
@@ -32,8 +32,14 @@ void Particle::CheckGroundCollision(float groundHeight, float elasticity, float 
     //push position on ground
     if (position.y - radius < groundHeight){
         position.y = groundHeight+radius;
+
+         //velocity: break it to downward(normal) + other(tangent)
+        glm::vec3 groundNormal = glm::vec3(0,1,0);
+        float normalComponent = glm::dot(velocity,groundNormal); 
+        glm::vec3 tangentComponent = velocity - normalComponent* groundNormal;
+        normalComponent *=-elasticity;
+        tangentComponent *= 1 - friction;
+        velocity = tangentComponent + normalComponent*groundNormal;
     }
-    //velocity: break it to downward + other
-    glm::dot(velocity,glm::vec3(0,1,0)); //groundNormal= vec3(0,1,0)
 }
 
