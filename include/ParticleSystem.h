@@ -14,6 +14,8 @@ Integrated motion
 class ParticleSystem
 {
 public:
+    ParticleSystem();
+    
     std::vector<Particle> particles;
 
     glm::vec3 emitPosition;
@@ -35,8 +37,6 @@ public:
     float elasticity;
     float friction;
     float groundHeight;
-
-
     
     void Update(float deltaTime);
     void SpawnParticles();

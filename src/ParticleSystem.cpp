@@ -2,14 +2,15 @@
 #include <cstdlib>
 #include <ctime>
 #include <glm/gtc/type_ptr.hpp>
+#include "imgui.h"
 
 ParticleSystem::ParticleSystem(){
     srand(time(0));
-    emitPosition = glm::vec3(0,0,0);
-    emitPositionVariance = glm::vec3(0,0,0);
+    emitPosition = glm::vec3(0,3,0);
+    emitPositionVariance = glm::vec3(1,1,1);
     
-    initialVelocity = glm::vec3(0,0,0);
-    initialVelocityVariance = glm::vec3(0,0,0);
+    initialVelocity = glm::vec3(0,2,0);
+    initialVelocityVariance = glm::vec3(1,1,1);
     emitRate = 10.0f;
     baseLife = 3.0f;
     lifeVariance = 1.0f;
@@ -169,5 +170,37 @@ void ParticleSystem::Draw(glm::mat4 viewProjection){
 }
 
 void ParticleSystem::DrawGUI(){
+    ImGui::Begin("Particle System");
 
+    // live particle count
+    ImGui::Text("Active Particles: %d", (int)particles.size());
+    ImGui::Separator();
+
+    if(ImGui::CollapsingHeader("Emitter")){
+        ImGui::DragFloat3("Emit Position",    glm::value_ptr(emitPosition), 0.1f);
+        ImGui::DragFloat3("Position Variance",glm::value_ptr(emitPositionVariance), 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat3("Initial Velocity", glm::value_ptr(initialVelocity), 0.1f);
+        ImGui::DragFloat3("Velocity Variance",glm::value_ptr(initialVelocityVariance), 0.1f, 0.0f, 10.0f);
+        ImGui::SliderFloat("Emit Rate",       &emitRate, 0.0f, 200.0f);
+    }
+
+    if(ImGui::CollapsingHeader("Lifespan")){
+        ImGui::SliderFloat("Base Life",     &baseLife,     0.1f, 10.0f);
+        ImGui::SliderFloat("Life Variance", &lifeVariance, 0.0f, 5.0f);
+    }
+
+    if(ImGui::CollapsingHeader("Physics")){
+        ImGui::SliderFloat("Gravity",           &gravity,          0.0f, 20.0f);
+        ImGui::SliderFloat("Air Density",        &airDensity,       0.0f, 5.0f);
+        ImGui::SliderFloat("Drag Coefficient",   &dragCoefficient,  0.0f, 2.0f);
+        ImGui::SliderFloat("Particle Radius",    &particleRadius,   0.01f, 1.0f);
+    }
+
+    if(ImGui::CollapsingHeader("Collision")){
+        ImGui::SliderFloat("Elasticity",    &elasticity,   0.0f, 1.0f);
+        ImGui::SliderFloat("Friction",      &friction,     0.0f, 1.0f);
+        ImGui::SliderFloat("Ground Height", &groundHeight, -5.0f, 5.0f);
+    }
+
+    ImGui::End();
 }

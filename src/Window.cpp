@@ -13,6 +13,7 @@ const char* Window::windowTitle = "Model Environment";
 Camera* Cam;
 
 // Cube* Window::cube = nullptr;
+ParticleSystem* Window::particleSystem  = nullptr;
 
 // Interaction Variables
 bool LeftDown, RightDown;
