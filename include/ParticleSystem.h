@@ -14,10 +14,14 @@ Integrated motion
 class ParticleSystem
 {
 public:
-    std::vector<Particle> Particles;
+    std::vector<Particle> particles;
 
     glm::vec3 emitPosition;
+    glm::vec3 emitPositionVariance;
+    
     glm::vec3 initialVelocity;
+    glm::vec3 initialVelocityVariance;
+
     float emitRate;
     float baseLife; //+lifeVariance = assign particle maxlife
     float lifeVariance;
@@ -39,6 +43,7 @@ public:
     void ApplyGravity(Particle& p); //basic gravity
     void ApplyDrag(Particle& p); //compute drag and call apply force
     void DrawGUI();
-    void Draw();//draw each particles
+    void DrawSphere(float radius, int slices, int stacks);
+    void Draw(glm::mat4 viewProjection);//draw each particles
 
 };

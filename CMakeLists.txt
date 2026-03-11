@@ -18,7 +18,7 @@ set(
     src/imgui_impl_glfw
     src/imgui_impl_opengl3.cpp
     src/Particle.cpp       
-    src/SpringDamper.cpp   
+    src/ParticleSystem.cpp   
 )
 
 # Add header files

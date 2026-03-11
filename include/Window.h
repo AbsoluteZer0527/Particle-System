@@ -4,6 +4,7 @@
 #include "Cube.h"
 #include "Shader.h"
 #include "core.h"
+#include "ParticleSystem.h"
 
 class Window {
 public:
@@ -13,7 +14,8 @@ public:
     static const char* windowTitle;
 
     // Objects to render
-    static Cube* cube;
+    // static Cube* cube;
+    static ParticleSystem* particleSystem;
 
     // Shader Program
     static GLuint shaderProgram;

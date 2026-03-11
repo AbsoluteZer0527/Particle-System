@@ -12,8 +12,7 @@ const char* Window::windowTitle = "Model Environment";
 // Camera Properties
 Camera* Cam;
 
-Cube* Window::cube = nullptr;
-
+// Cube* Window::cube = nullptr;
 
 // Interaction Variables
 bool LeftDown, RightDown;
@@ -38,8 +37,9 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects() {
     // Create a cube
-    cube = new Cube();
-    cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
+    // cube = new Cube();
+    // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
+    particleSystem  = new ParticleSystem();
 
     Cam->SetDistance(8.0f);
     Cam->SetIncline(-20.0f);
@@ -48,7 +48,8 @@ bool Window::initializeObjects() {
 
 void Window::cleanUp() {
     // Deallcoate the objects.
-    delete cube;
+    // delete cube;
+    delete particleSystem;
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
 }
@@ -118,8 +119,7 @@ void Window::idleCallback() {
 
     // Clamp deltaTime so resize window wont explode it.
     deltaTime = glm::min(deltaTime, 0.05f);
-    
-
+    particleSystem->Update(deltaTime);
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -139,16 +139,16 @@ void Window::displayCallback(GLFWwindow* window) {
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_color);
 
     // Render the object.
-    cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-
+    // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    particleSystem->Draw(Cam->GetViewProjectMtx());
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    ImGui::ShowDemoWindow();
-
+    // ImGui::ShowDemoWindow();
+    particleSystem->DrawGUI();
 
     // Rendering
     ImGui::Render();
