@@ -3,11 +3,15 @@
 #include <ctime>
 #include <glm/gtc/type_ptr.hpp>
 #include "imgui.h"
+#include <cmath>
 
 ParticleSystem::ParticleSystem(){
     srand(time(0));
-    emitPosition = glm::vec3(0,3,0);
+    emitPosition = glm::vec3(0,8,0);
     emitPositionVariance = glm::vec3(1,1,1);
+    
+    emitterShape = NONE;
+    boundaryRadius = 2.0f;
     
     initialVelocity = glm::vec3(0,2,0);
     initialVelocityVariance = glm::vec3(1,1,1);
@@ -37,18 +41,38 @@ void ParticleSystem::SpawnParticles(){
     //Position variance
     
     float s  = (float)rand() / RAND_MAX;
-    float t = (float)rand() / RAND_MAX;
+    //caps t below 1.0
+    float t = (float)rand() / RAND_MAX * 0.9999f;
 
     float u = 2* glm::pi<float>() * s; //convert s into a random Y axis angle 0 to 2pi
-    float v = sqrt(t / (1 - t)); //stretch factor from t that controls dx and dz
+    float v = sqrt(t * (1 - t)); //stretch factor from t that controls dx and dz
     
     float dx = 2 * v * cos(u);
     float dy = 1 - 2*t;
     float dz = 2 * v * sin(u);
 
-    p.position.x = emitPosition.x + dx * emitPositionVariance.x;
-    p.position.y = emitPosition.y + dy * emitPositionVariance.y;
-    p.position.z = emitPosition.z + dz * emitPositionVariance.z;
+    switch(emitterShape){
+        case SPHERE:{
+            float randomRadius = boundaryRadius * cbrt(((float)rand() / RAND_MAX));
+            p.position = emitPosition + glm::normalize(glm::vec3(dx,dy,dz)) * randomRadius;
+            break;
+        }
+        case CUBE:{
+            p.position.x = emitPosition.x + ((float)rand() / RAND_MAX * 2.0f - 1.0f) * boundaryRadius;
+            p.position.y = emitPosition.y + ((float)rand() / RAND_MAX * 2.0f - 1.0f) * boundaryRadius;
+            p.position.z = emitPosition.z + ((float)rand() / RAND_MAX * 2.0f - 1.0f) * boundaryRadius;
+            break;
+        }
+        case NONE:
+        default: {
+            p.position.x = emitPosition.x + dx * emitPositionVariance.x;
+            p.position.y = emitPosition.y + dy * emitPositionVariance.y;
+            p.position.z = emitPosition.z + dz * emitPositionVariance.z;
+            break;
+        }
+    }
+
+    
 
     p.velocity.x = initialVelocity.x + dx * initialVelocityVariance.x;
     p.velocity.y = initialVelocity.y + dy * initialVelocityVariance.y;
@@ -151,20 +175,23 @@ void ParticleSystem::Draw(glm::mat4 viewProjection){
 
         // fade from bright to dark as particle ages
         float lifeRatio = p.life / p.maxLife;
-        glColor3f(0.2f + 0.8f * lifeRatio, 0.4f * lifeRatio, 0.8f);
+        glColor3f(1.0f, (0.6f + 0.4f * lifeRatio), 66/255.0f * lifeRatio);
 
         DrawSphere(p.radius, 12, 12);
         glPopMatrix();
     }
     glDisable(GL_LIGHTING);
     //draw ground
-    glColor3f(1.0, 1.0, 1.0);
+    glPushMatrix();
+    glLoadMatrixf(glm::value_ptr(viewProjection));
+    glColor3f(84/255.0f, 120/255.0f, 255/255.0f);
     glBegin(GL_QUADS);
-    glVertex3f (-10, groundHeight, -10);
-    glVertex3f ( 10, groundHeight, -10);
-    glVertex3f ( 10, groundHeight,  10);
-    glVertex3f (-10, groundHeight,  10);
+    glVertex3f (-20, groundHeight, -20);
+    glVertex3f ( 20, groundHeight, -20);
+    glVertex3f ( 20, groundHeight,  20);
+    glVertex3f (-20, groundHeight,  20);
     glEnd();
+    glPopMatrix();
 
     glEnable(GL_LIGHTING);
 }
@@ -199,8 +226,11 @@ void ParticleSystem::DrawGUI(){
     if(ImGui::CollapsingHeader("Collision")){
         ImGui::SliderFloat("Elasticity",    &elasticity,   0.0f, 1.0f);
         ImGui::SliderFloat("Friction",      &friction,     0.0f, 1.0f);
-        ImGui::SliderFloat("Ground Height", &groundHeight, -5.0f, 5.0f);
+        ImGui::SliderFloat("Ground Height", &groundHeight, -10.0f, 10.0f);
     }
 
+    const char* shapes[] = { "Sphere", "Cube", "None" };
+    ImGui::Combo("Emitter Shape", (int*)&emitterShape, shapes,3);
+    ImGui::SliderFloat("Boundary Size", &boundaryRadius, 0.1f, 5.0f);
     ImGui::End();
 }

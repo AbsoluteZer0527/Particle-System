@@ -18,6 +18,11 @@ public:
     
     std::vector<Particle> particles;
 
+    //extra: keep particles in a shape
+    enum EmitterShape { SPHERE, CUBE, NONE};
+    EmitterShape emitterShape;
+    float boundaryRadius;  
+
     glm::vec3 emitPosition;
     glm::vec3 emitPositionVariance;
     

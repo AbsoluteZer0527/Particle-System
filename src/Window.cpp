@@ -125,7 +125,7 @@ void Window::idleCallback() {
 
 void Window::displayCallback(GLFWwindow* window) {
     // Clear the color and depth buffers.
-    glClearColor(0.1f, 0.05f, 0.15f, 1.0f);    
+    glClearColor(83/255.0f, 203/255.0f, 243/255.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //setup lighting position + color
